@@ -1,0 +1,137 @@
+{% extends 'Layout.html'%}
+{% load static %}
+{% block title %}
+
+		<script src="{% static 'assets1/js/jspdf.debug.js' %}"></script>
+        <script src="{% static 'assets1/js/pdfmake.min.js' %}"></script>
+        <script src="{% static 'assets1/js/html2canvas.min.js' %}"></script>
+
+        <script type="text/javascript">
+        function Export() {
+            html2canvas(document.getElementById('example3'), {
+                onrendered: function (canvas) {
+                    var data = canvas.toDataURL();
+                    var docDefinition = {
+                        content: [{
+                            image: data,
+                            width: 500,
+                        }
+                        ]
+                    };
+                    pdfMake.createPdf(docDefinition).download("Table.pdf");
+                }
+            });
+        }
+        </script>
+
+
+		<div class="page-wrapper">
+			<div class="content container-fluid" style="margin-top:-7%;">
+
+				<!-- Page Header -->
+				<div class="page-header">
+					<div class="row">
+						<div class="col">
+							<form action="/show-reports/" method="post">
+								{% csrf_token %}
+								<div class="form-group" style="width:20%;">
+									<label>Start Date</label>
+									<input class="form-control" type="date" placeholder="Start Date" name="start_date" value="{{sdate|date:'Y-m-d'}}" required>
+								</div>
+								<div class="form-group" style="width:20%;margin-left:22%;margin-top:-8.35%;">
+									<label>End Date</label>
+									<input class="form-control" type="date" placeholder="End Date" name="end_date" value="{{edate|date:'Y-m-d'}}" required>
+								</div>
+								<div class="form-group" style="width:20%;margin-left:44%;margin-top:-8.35%;">
+									<label>Sort By</label>
+									<select class="form-control select" name="sortby">
+										<option value="0" {% if sb == 0 %}selected{% endif %}>All Accounts</option>
+										{% for j in accounts %}
+											<option value="{{j.account_id}}" {% if j.account_id == sb %}selected{% endif %}>{{j.account_name}}</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div style="margin-left:66%;margin-top:-5.35%;">
+									<button class="btn btn-primary" type="submit">Generate</button>
+								</div>
+							</form>
+						</div>
+						<div class="col-auto text-right">
+							<button class="btn btn-primary add-button" onclick="Export();">
+								<i class="fas fa-download"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /Page Header -->
+
+                <div class="row">
+					<div class="col-md-12 d-flex">
+						<!-- Recent Bookings -->
+						<div class="card card-table flex-fill">
+							<div class="card-body">
+								<div class="table-responsive">
+									<table class="table table-center" id="example3">
+										<thead>
+											<tr>
+												{% if sb == 0 %}
+													<td colspan="5" style="color:blue;text-align:center;">Note: Report Generated For All Accounts From {{sdate}} to {{edate}}</td>
+												{% else %}
+													{% for i in accounts %}
+														{% if i.account_id == sb %}
+															<td colspan="5" style="color:blue;text-align:center;">Note: Report Generated For {{i.account_name}} From {{sdate}} to {{edate}}</td>
+														{% endif %}
+													{% endfor %}
+												{% endif %}
+											</tr>
+											<tr>
+												<th>Date</th>
+												<th>Narration</th>
+												<th>Credit/Debit</th>
+												<th>Account</th>
+												<th>Action</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% if data_cnt == 0 %}
+											<tr>
+												<td colspan="5" style="text-align:center;color:red;">No Data Found</td>
+											</tr>
+											{% endif %}
+											{% for i in data %}
+											<tr>
+												<td>{{i.data_date}}</td>
+												<td>{{i.narration}}</td>
+												<td>
+													{% if i.account_id.cur == 1 %}
+														{% if i.cd == 1 %}
+															<span style="color:green">Rs. {{i.amount}}</span>
+														{% endif %}
+														{% if i.cd == 2 %}
+															<span style="color:red">Rs. {{i.amount}}</span>
+														{% endif %}
+													{% endif %}
+													{% if i.account_id.cur == 2 %}
+														{% if i.cd == 1 %}
+															<span style="color:green">$ {{i.amount}}</span>
+														{% endif %}
+														{% if i.cd == 2 %}
+															<span style="color:red">$ {{i.amount}}</span>
+														{% endif %}
+													{% endif %}
+												</td>
+												<td><a href="/data-tables/{{i.account_id_id}}">{{i.account_id.account_name}}</a></td>
+												<td><span data-html2canvas-ignore="true"><a style="color:green;" href="/edit-entry/{{i.data_id}}">Edit</a> | <a style="color:red;" href="/delete-entry/{{i.data_id}}">Delete</a></span></td>
+											</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<!-- /Recent Bookings -->
+                    </div>
+                </div>
+			</div>
+		</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'Layout.html'%}
+{% load static %}
+{% block title %}
+
+		<script src="{% static 'assets1/js/jspdf.debug.js' %}"></script>
+        <script src="{% static 'assets1/js/pdfmake.min.js' %}"></script>
+        <script src="{% static 'assets1/js/html2canvas.min.js' %}"></script>
+
+        <script type="text/javascript">
+        function Export() {
+            html2canvas(document.getElementById('example3'), {
+                onrendered: function (canvas) {
+                    var data = canvas.toDataURL();
+                    var docDefinition = {
+                        content: [{
+                            image: data,
+                            width: 500,
+                        }
+                        ]
+                    };
+                    pdfMake.createPdf(docDefinition).download("Table.pdf");
+                }
+            });
+        }
+
+        const formatter = new Intl.NumberFormat('en-US',{
+        	style:'currency',
+        	currency:'INR',
+        	minimumFractionDigits:2
+        })
+
+        </script>
+
+
+		<div class="page-wrapper">
+			<div class="content container-fluid" style="margin-top:-7%;">
+
+				<!-- Page Header -->
+				<div class="page-header">
+					<div class="row">
+						<div class="col">
+							<h3 class="page-title">{{account.account_name}}</h3>
+						</div>
+						<div class="col-auto text-right">
+							<button class="btn btn-primary add-button" onclick="Export();">
+								<i class="fas fa-download"></i>
+							</button>
+							<a href="/create-entry/{{account.account_id}}" class="btn btn-primary add-button">
+								<i class="fas fa-plus"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+				<!-- /Page Header -->
+
+                <div class="row">
+					<div class="col-md-12 d-flex">
+						<!-- Recent Bookings -->
+						<div class="card card-table flex-fill">
+							<div class="card-body">
+								<div class="table-responsive">
+									<table class="table table-center" id="example3">
+										<thead>
+											<tr>
+												<td colspan="5" style="color:blue;text-align:center;">{{account.account_name}} {% if account.cur == 1 %}[ INR ]{% else %}[ CAD ]{% endif %}</td>
+											</tr>
+											<tr>
+												<th>Date</th>
+												<th>Narration</th>
+												<th>Credit/Debit</th>
+												<th>Balance</th>
+												<th>Action</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% if data_cnt == 0 %}
+											<tr>
+												<td colspan="5" style="text-align:center;color:red;">No Data Found</td>
+											</tr>
+											{% endif %}
+											{% for i,j in data %}
+											<tr>
+												<td>{{i.data_date}}</td>
+												<td>{{i.narration}}</td>
+												<td>
+													{% if i.account_id.cur == 1 %}
+														{% if i.cd == 1 %}
+															<span style="color:green">Rs. {{i.amount}}</span>
+														{% endif %}
+														{% if i.cd == 2 %}
+															<span style="color:red">Rs. {{i.amount}}</span>
+														{% endif %}
+													{% endif %}
+													{% if i.account_id.cur == 2 %}
+														{% if i.cd == 1 %}
+															<span style="color:green">$ {{i.amount}}</span>
+														{% endif %}
+														{% if i.cd == 2 %}
+															<span style="color:red">$ {{i.amount}}</span>
+														{% endif %}
+													{% endif %}
+												</td>
+												<td>
+													{% if i.account_id.cur == 1 %}
+														{% if j > 0 %}
+															<span style="color:green">Rs. {{j}}</span>
+														{% else %}
+															<span style="color:red">Rs. {{j}}</span>
+														{% endif %}
+													{% endif %}
+													{% if i.account_id.cur == 2 %}
+														{% if j > 0 %}
+															<span style="color:green">$ {{j}}</span>
+														{% else %}
+															<span style="color:red">$ {{j}}</span>
+														{% endif %}
+													{% endif %}
+												</td>
+												<td><span data-html2canvas-ignore="true"><a style="color:green;" href="/edit-entry/{{i.data_id}}">Edit</a> | <a style="color:red;" href="/delete-entry/{{i.data_id}}">Delete</a></span></td>
+											</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<!-- /Recent Bookings -->
+                    </div>
+                </div>
+			</div>
+		</div>
+{% endblock %}

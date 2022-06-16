@@ -1,0 +1,58 @@
+{% extends 'Layout.html'%}
+{% load static %}
+{% block title %}
+		<div class="page-wrapper">
+			<div class="content container-fluid">
+				<div class="row">
+					<div class="col-xl-8 offset-xl-2">
+
+						<!-- Page Header -->
+						<div class="page-header">
+							<div class="row">
+								<div class="col-sm-12">
+									<h3 class="page-title">Edit Entry</h3>
+								</div>
+							</div>
+						</div>
+						<!-- /Page Header -->
+
+						<div class="card">
+							<div class="card-body">
+
+								<!-- Form -->
+								<form action="/save-entry/" method="post">
+									{% csrf_token %}
+                                    <input type="hidden" name="data_id" value="{{dat_id}}">
+									<input type="hidden" name="account_id" value="{{acc_id}}">
+                                    <div class="form-group">
+										<label>Date</label>
+										<input class="form-control" type="date" placeholder="Date" name="data_date" value="{{data.data_date|date:'Y-m-d'}}" required>
+									</div>
+									<div class="form-group">
+										<label>Narration</label>
+										<input class="form-control" type="text" placeholder="Narration" name="narration" value="{{data.narration}}" required>
+									</div>
+									<div class="form-group">
+										<label>Credit/Debit</label>
+										<select class="form-control select" name="cd">
+											<option value="1" {% if data.cd == 1 %} selected {% endif %}>Credit</option>
+											<option value="2" {% if data.cd == 2 %} selected {% endif %}>Debit</option>
+										</select>
+									</div>
+                                    <div class="form-group">
+										<label>Amount</label>
+										<input class="form-control" type="number" placeholder="Amount" name="amount" step="0.01" value="{{data.amount}}" required>
+									</div>
+									<div class="mt-4">
+										<button class="btn btn-primary" type="submit">Submit</button>
+									</div>
+								</form>
+								<!-- /Form -->
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock %}

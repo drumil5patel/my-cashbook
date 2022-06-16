@@ -1,0 +1,76 @@
+{% extends 'Layout.html'%}
+{% load static %}
+{% block title %}
+		<div class="page-wrapper">
+			<div class="content container-fluid" style="margin-top:-7%;">
+
+				<!-- Page Header -->
+				<div class="page-header">
+					<div class="row">
+						<div class="col">
+							<h3 class="page-title">Accounts</h3>
+						</div>
+						<div class="col-auto text-right">
+							<a href="/create-account/" class="btn btn-primary add-button">
+								<i class="fas fa-plus"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+				<!-- /Page Header -->
+
+				<div class="row pricing-box">
+				{% if account_cnt == 0 %}
+					<div class="col-md-6 col-lg-4 col-xl-12">
+						<div class="card">
+							<div class="card-body" style="text-align:center;">
+								<span style="color:red;">No Account Found...Create New One...</span>
+							</div>
+						</div>
+					</div>
+				{% else %}
+					{% for i in data %}
+					<!--<div class="col-md-6 col-lg-4 col-xl-3">-->
+					<div class="col-md-6 col-lg-4 col-xl-4">
+						<div class="card">
+							<div class="card-body">
+								<div class="pricing-header">
+									<a href="/data-tables/{{i.account_id}}"><h2 style="color:black;">{{i.account_name}}</h2></a>
+									<p>
+										{% if i.cur == 1 %}
+											Indian Rupees
+										{% endif %}
+										{% if i.cur == 2 %}
+											Canadian Dollars
+										{% endif %}
+									</p>
+								</div>
+								<!--
+								{% if i.cur == 1 %}
+									<div class="pricing-card-price">
+										<h6 class="heading2 price">Total Credit: Rs. 0.00</h6>
+										<h6 class="heading2 price">Total Debit: Rs. 0.00</h6>
+										<h6 class="heading2 price">Available: Rs. 0.00</h6>
+									</div>
+								{% endif %}
+								{% if i.cur == 2 %}
+									<div class="pricing-card-price">
+										<h6 class="heading2 price">Total Credit: $0.00</h6>
+										<h6 class="heading2 price">Total Debit: $0.00</h6>
+										<h6 class="heading2 price">Available: $0.00</h6>
+									</div>
+								{% endif %}
+								-->
+								<a style="width:30%;" href="/data-tables/{{i.account_id}}" class="btn btn-primary btn-block">Open</a>
+								<a style="width:30%;float:right;margin-top:-11.7%;margin-right:35%;" href="/edit-account/{{i.account_id}}" class="btn btn-primary btn-block">Edit</a>
+								<a style="width:30%;float:right;margin-top:-11.7%;margin-right:-65%;" href="/delete-account/{{i.account_id}}" class="btn btn-primary btn-block">Delete</a>
+
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+				{% endif %}
+				</div>
+			</div>
+		</div>
+{% endblock %}
